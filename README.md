@@ -19,6 +19,8 @@ La infraestructura implementa una separación entre servicios públicos y acceso
 
 ## Topología
 
+![Topología de Infraestructura 3 en GNS3](evidencias/01_topologia_gns3.png)
+
 `USUARIO → SW-USUARIOS → R-CISCO → ISP → FGT-SERVER → Web-Server`
 
 Direcciones principales:
