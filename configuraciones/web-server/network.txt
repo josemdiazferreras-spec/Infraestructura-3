@@ -1,0 +1,6 @@
+# Web-Server - datos de red recopilados
+hostname: ubuntu-cloud
+ens3: 10.6.93.130/28
+gateway: 10.6.93.129
+network: 10.6.93.128/28
+ens4: DOWN

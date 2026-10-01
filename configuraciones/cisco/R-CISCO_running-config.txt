@@ -1,0 +1,42 @@
+!
+! R-CISCO - running-config recopilado del laboratorio
+!
+version 15.2
+hostname R-CISCO
+no aaa new-model
+no ip icmp rate-limit unreachable
+ip dhcp excluded-address 10.6.93.1 10.6.93.9
+ip dhcp excluded-address 10.6.93.101 10.6.93.126
+ip dhcp pool USUARIOS
+ network 10.6.93.0 255.255.255.128
+ default-router 10.6.93.1
+ dns-server 8.8.8.8
+no ip domain lookup
+ip cef
+no ipv6 cef
+ip tcp synwait-time 5
+interface FastEthernet0/0
+ description WAN hacia ISP
+ ip address 200.6.93.2 255.255.255.252
+ ip nat outside
+ duplex full
+interface GigabitEthernet1/0
+ description LAN Usuarios
+ ip address 10.6.93.1 255.255.255.128
+ ip nat inside
+ negotiation auto
+interface GigabitEthernet2/0
+ no ip address
+ shutdown
+interface GigabitEthernet3/0
+ no ip address
+ shutdown
+interface GigabitEthernet4/0
+ no ip address
+ shutdown
+ip nat inside source list 1 interface FastEthernet0/0 overload
+ip forward-protocol nd
+no ip http server
+no ip http secure-server
+ip route 0.0.0.0 0.0.0.0 200.6.93.1
+access-list 1 permit 10.6.93.0 0.0.0.127

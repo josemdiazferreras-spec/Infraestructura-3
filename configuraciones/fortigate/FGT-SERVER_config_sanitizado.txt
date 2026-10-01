@@ -1,0 +1,130 @@
+# FGT-SERVER - configuración relevante recopilada
+# SECRETOS REDACTADOS deliberadamente
+
+## Interfaces
+config system interface
+    edit "port1"
+        set vdom "root"
+        set ip 200.6.93.6 255.255.255.252
+        set allowaccess ping http
+        set type physical
+        set snmp-index 1
+    next
+    edit "port2"
+        set vdom "root"
+        set ip 10.6.93.129 255.255.255.240
+        set allowaccess ping
+        set type physical
+        set device-identification enable
+        set lldp-transmission enable
+        set role lan
+        set snmp-index 2
+    next
+    edit "VPN-REMOTE"
+        set vdom "root"
+        set ip 169.254.1.1 255.255.255.255
+        set allowaccess fabric
+        set type tunnel
+        set remote-ip 169.254.1.1 255.255.255.255
+        set snmp-index 15
+        set interface "port1"
+    next
+end
+
+## VIP HTTPS
+config firewall vip
+    edit "VIP-HTTPS"
+        set extip 200.6.93.6
+        set mappedip "10.6.93.130"
+        set extintf "port1"
+        set portforward enable
+        set extport 443
+        set mappedport 443
+    next
+end
+
+## Firewall policies
+config firewall policy
+    edit 1
+        set name "HTTPS-SIN-VPN"
+        set srcintf "port1"
+        set dstintf "port2"
+        set action accept
+        set srcaddr "all"
+        set dstaddr "VIP-HTTPS"
+        set schedule "always"
+        set service "HTTPS"
+    next
+    edit 2
+        set name "vpn_VPN-REMOTE_remote_0"
+        set srcintf "VPN-REMOTE"
+        set dstintf "port2"
+        set action accept
+        set srcaddr "VPN-REMOTE_range"
+        set dstaddr "port2 address"
+        set schedule "always"
+        set service "SSH"
+        set nat enable
+    next
+end
+
+## Phase 1 — PSK REDACTADA
+config vpn ipsec phase1-interface
+    edit "VPN-REMOTE"
+        set type dynamic
+        set interface "port1"
+        set mode aggressive
+        set peertype any
+        set net-device disable
+        set mode-cfg enable
+        set proposal des-md5 des-sha1
+        set wizard-type dialup-forticlient
+        set xauthtype auto
+        set authusrgrp "VPN-USERS"
+        set ipv4-start-ip 10.6.93.193
+        set ipv4-end-ip 10.6.93.206
+        set ipv4-netmask 255.255.255.240
+        set dns-mode auto
+        set ipv4-split-include "VPN-REMOTE_split"
+        set save-password enable
+        set psksecret <REDACTED>
+    next
+end
+
+## Phase 2
+config vpn ipsec phase2-interface
+    edit "VPN-REMOTE"
+        set phase1name "VPN-REMOTE"
+        set proposal des-md5 des-sha1
+    next
+end
+
+## Address objects
+config firewall address
+    edit "port2 address"
+        set type interface-subnet
+        set subnet 10.6.93.129 255.255.255.240
+        set interface "port2"
+    next
+    edit "VPN-REMOTE_range"
+        set type iprange
+        set start-ip 10.6.93.193
+        set end-ip 10.6.93.206
+    next
+end
+
+## Split tunnel address group
+config firewall addrgrp
+    edit "VPN-REMOTE_split"
+        set member "port2 address"
+    next
+end
+
+## User group
+config user group
+    edit "VPN-USERS"
+        set member "vpnuser"
+    next
+end
+
+# No PSK/XAuth password is stored in this file.

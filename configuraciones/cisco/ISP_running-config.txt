@@ -1,0 +1,34 @@
+!
+! ISP - running-config recopilado del laboratorio
+!
+version 15.2
+hostname ISP
+no aaa new-model
+no ip icmp rate-limit unreachable
+no ip domain lookup
+ip cef
+no ipv6 cef
+ip tcp synwait-time 5
+interface FastEthernet0/0
+ description Hacia R-CISCO
+ ip address 200.6.93.1 255.255.255.252
+ duplex full
+interface GigabitEthernet1/0
+ description Hacia FGT-SERVER
+ ip address 200.6.93.5 255.255.255.252
+ negotiation auto
+interface GigabitEthernet2/0
+ no ip address
+ shutdown
+interface GigabitEthernet3/0
+ description Gestion temporal NAT
+ no ip address
+ shutdown
+interface GigabitEthernet4/0
+ description Gestion temporal NAT
+ ip address dhcp
+ negotiation auto
+ip forward-protocol nd
+no ip http server
+no ip http secure-server
+ip route 0.0.0.0 0.0.0.0 192.168.42.1
